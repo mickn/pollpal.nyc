@@ -250,13 +250,6 @@ layout: default
             link.click();
         });
 
-        // Tweet results handler
-        tweetResultsBtn.addEventListener('click', () => {
-            const text = `I just took the PollPal quiz! My top match was ${sortedCandidates[0][0]} at ${Math.round(((sortedCandidates[0][1] - minScore) / scoreRange) * 100)}%\n\nFind your match at`;
-            const url = 'https://pollpal.nyc';
-            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-        });
-
         // Add results with visual bars
         sortedCandidates.forEach(([candidate, score]) => {
             const normalizedScore = scoreRange > 0
