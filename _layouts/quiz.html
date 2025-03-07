@@ -1,0 +1,289 @@
+---
+layout: default
+---
+
+{{ content }}
+
+<script>
+    // Campaign website URLs for candidates
+    const candidateUrls = {
+        "Andrew Cuomo": "https://www.andrewcuomo.com",
+        "Brad Lander": "https://www.landerfornyc.com",
+        "Curtis Sliwa": "https://www.instagram.com/curtissliwaformayor/?hl=en",
+        "Eric Adams": "https://www.nyc.gov/office-of-the-mayor/index.page",
+        "Jessica Ramos": "https://www.ramosfornyc.com",
+        "Jim Walden": "https://www.jimfornyc.com",
+        "Michael Blake": "https://blakefornyc.com",
+        "Scott Stringer": "https://scottstringernyc.com",
+        "Whitney Tilson": "https://www.whitneyformayor.com",
+        "Zellnor Myrie": "https://www.zellnor.nyc",
+        "Zohran Mamdani": "https://www.zohranfornyc.com"
+    };
+
+    // candidate stance reference (same as original)
+    const candidateStances = {
+        "Andrew Cuomo": [+1, -1, -1, +1, 0, +1, -1, -1, 0, +1, +1, 0, +1, +1],
+        "Brad Lander": [-1, +1, +1, +1, 0, +1, -1, -1, -1, -1, +1, +1, 0, +1],
+        "Curtis Sliwa": [+1, -1, -1, -1, +1, 0, 0, -1, +1, +1, 0, -1, +1, -1],
+        "Eric Adams": [+1, -1, -1, 0, -1, +1, 0, -1, -1, +1, +1, -1, +1, 0],
+        "Jessica Ramos": [-1, +1, +1, +1, -1, +1, -1, 0, -1, -1, +1, +1, -1, +1],
+        "Jim Walden": [+1, -1, -1, 0, 0, +1, 0, -1, +1, 0, +1, -1, +1, 0],
+        "Michael Blake": [0, 0, +1, +1, 0, +1, -1, 0, -1, 0, +1, +1, 0, 0],
+        "Scott Stringer": [0, +1, 0, +1, 0, +1, -1, -1, -1, 0, +1, 0, +1, +1],
+        "Whitney Tilson": [+1, -1, -1, 0, +1, +1, +1, -1, +1, 0, +1, -1, +1, 0],
+        "Zellnor Myrie": [0, 0, +1, 0, -1, +1, -1, -1, 0, -1, +1, +1, +1, 0],
+        "Zohran Mamdani": [-1, +1, +1, +1, 0, 0, -1, +1, -1, -1, 0, +1, -1, +1]
+    };
+
+    // quiz management
+    let currentQuestion = 1;
+    const totalQuestions = 14;
+
+    const welcomeCard = document.getElementById('welcomeCard');
+    const quizContainer = document.getElementById('quizContainer');
+    const resultsCard = document.getElementById('resultsCard');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const scoreBtn = document.getElementById('scoreBtn');
+    const scoreList = document.getElementById('scoreList');
+    const progressBar = document.getElementById('progressBar');
+
+    const startQuizBtn = document.getElementById('startQuizBtn');
+
+    // show the welcome card first, hide quiz
+    welcomeCard.classList.remove('hidden');
+    quizContainer.classList.add('hidden');
+
+    startQuizBtn.addEventListener('click', () => {
+        // hide welcome card, show quiz card #1
+        welcomeCard.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        showQuestion(currentQuestion);
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentQuestion > 1) {
+            currentQuestion--;
+            showQuestion(currentQuestion);
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentQuestion < totalQuestions) {
+            currentQuestion++;
+            showQuestion(currentQuestion);
+        }
+    });
+
+    scoreBtn.addEventListener('click', scoreQuiz);
+
+    function showQuestion(questionNum) {
+        // hide all question cards
+        const cards = document.querySelectorAll('.quiz-card');
+        cards.forEach(card => card.classList.add('hidden'));
+
+        // show the one with data-question = questionNum
+        const currentCard = document.querySelector(`.quiz-card[data-question="${questionNum}"]`);
+        if (currentCard) {
+            currentCard.classList.remove('hidden');
+        }
+
+        // update progress bar
+        const progress = (questionNum / totalQuestions) * 100;
+        progressBar.style.width = `${progress}%`;
+
+        // update nav buttons
+        if (questionNum === 1) {
+            prevBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+            scoreBtn.classList.add('hidden');
+        } else if (questionNum === totalQuestions) {
+            prevBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            scoreBtn.classList.remove('hidden');
+        } else {
+            prevBtn.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+            scoreBtn.classList.add('hidden');
+        }
+    }
+
+    // scoring function
+    function scoreQuiz() {
+        // gather answers from radio buttons
+        const answerFactor = {
+            agree: 1,
+            disagree: -1,
+            skip: 0
+        };
+
+        // initialize candidate scores
+        const scores = {};
+        Object.keys(candidateStances).forEach(candidate => {
+            scores[candidate] = 0;
+        });
+
+        for (let i = 1; i <= totalQuestions; i++) {
+            const radios = document.getElementsByName(`q${i}`);
+            let userChoice = 'skip'; // default if none is found (should be skip anyway)
+            for (const radio of radios) {
+                if (radio.checked) {
+                    userChoice = radio.value;
+                    break;
+                }
+            }
+            const factor = answerFactor[userChoice] || 0;
+            const index = i - 1; // array index in candidateStances
+
+            for (const candidate in candidateStances) {
+                const stance = candidateStances[candidate][index];
+                scores[candidate] += factor * stance;
+            }
+        }
+
+        // sort by score descending
+        const sortedCandidates = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        const maxScore = Math.max(...sortedCandidates.map(c => c[1]));
+        const minScore = Math.min(...sortedCandidates.map(c => c[1]));
+        const scoreRange = maxScore - minScore;
+
+        // display results
+        quizContainer.classList.add('hidden');
+        resultsCard.classList.remove('hidden');
+
+        scoreList.innerHTML = '';
+
+        // Add share results section to top of results
+        const shareSection = document.createElement("div");
+        shareSection.className = "mb-8 text-center";
+        shareSection.innerHTML = `
+            <h3 class="text-lg font-medium mb-2">Share Your Results</h3>
+            <button id="generateShareImage" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Generate Shareable Image
+            </button>
+            <div id="shareImageContainer" class="mt-4 hidden">
+                <canvas id="shareCanvas" class="mx-auto mb-2 border border-gray-200 rounded"></canvas>
+                <div class="flex justify-center mt-2 space-x-2">
+                    <button id="downloadImage" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                        Download Image
+                    </button>
+                </div>
+            </div>
+        `;
+        scoreList.appendChild(shareSection);
+
+        // Set up share image generation
+        const generateShareImage = document.getElementById('generateShareImage');
+        const shareImageContainer = document.getElementById('shareImageContainer');
+        const shareCanvas = document.getElementById('shareCanvas');
+        const downloadImageBtn = document.getElementById('downloadImage');
+        const tweetResultsBtn = document.getElementById('tweetResults');
+
+        generateShareImage.addEventListener('click', () => {
+            shareImageContainer.classList.remove('hidden');
+            const ctx = shareCanvas.getContext('2d');
+
+            // Set canvas size for social sharing
+            shareCanvas.width = 1200;
+            shareCanvas.height = 630;
+            shareCanvas.style.width = '100%';
+            shareCanvas.style.maxWidth = '600px';
+            shareCanvas.style.height = 'auto';
+
+            // Draw background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, shareCanvas.width, shareCanvas.height);
+
+            // Add gradient header
+            const gradient = ctx.createLinearGradient(0, 0, 0, 150);
+            gradient.addColorStop(0, '#2563eb');
+            gradient.addColorStop(1, '#1d4ed8');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, shareCanvas.width, 150);
+
+            // Add title
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('My PollPal.nyc Results', shareCanvas.width / 2, 90);
+
+            // Draw top 3 results
+            const top3 = sortedCandidates.slice(0, 3);
+            ctx.font = '32px sans-serif';
+            ctx.fillStyle = '#1f2937';
+
+            top3.forEach((candidate, index) => {
+                const yPos = 250 + (index * 120);
+                const normalizedScore = Math.round(((candidate[1] - minScore) / scoreRange) * 100);
+
+                // Draw candidate name
+                ctx.textAlign = 'left';
+                ctx.fillText(candidate[0], 100, yPos);
+
+                // Draw score
+                ctx.textAlign = 'right';
+                ctx.fillText(`${normalizedScore}%`, 1100, yPos);
+
+                // Draw bar background
+                ctx.fillStyle = '#e5e7eb';
+                ctx.fillRect(100, yPos + 20, 1000, 30);
+
+                // Draw score bar
+                ctx.fillStyle = '#2563eb';
+                ctx.fillRect(100, yPos + 20, normalizedScore * 10, 30);
+
+                ctx.fillStyle = '#1f2937';
+            });
+
+            // Add footer text
+            ctx.font = '24px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#6b7280';
+            ctx.fillText('Take the quiz at pollpal.nyc', shareCanvas.width / 2, 580);
+        });
+
+        // Download image handler
+        downloadImageBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'pollpal-results.png';
+            link.href = shareCanvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // Tweet results handler
+        tweetResultsBtn.addEventListener('click', () => {
+            const text = `I just took the PollPal quiz! My top match was ${sortedCandidates[0][0]} at ${Math.round(((sortedCandidates[0][1] - minScore) / scoreRange) * 100)}%\n\nFind your match at`;
+            const url = 'https://pollpal.nyc';
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        });
+
+        // Add results with visual bars
+        sortedCandidates.forEach(([candidate, score]) => {
+            const normalizedScore = scoreRange > 0
+                ? Math.round(((score - minScore) / scoreRange) * 100)
+                : 50; // Default to 50% if all scores are the same
+
+            const div = document.createElement("div");
+            div.className = "mb-4";
+            div.innerHTML = `
+                <div class="flex justify-between mb-1">
+                    <span class="font-medium text-slate-800">
+                        ${candidateUrls[candidate]
+                    ? `<a href="${candidateUrls[candidate]}" target="_blank" class="text-blue-600 hover:text-blue-800">${candidate}</a>`
+                    : candidate}
+                    </span>
+                    <span class="text-sm text-slate-500">Score: ${score}</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="result-bar bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            `;
+            scoreList.appendChild(div);
+
+            // Animate the bars after a short delay
+            setTimeout(() => {
+                div.querySelector('.result-bar').style.width = `${normalizedScore}%`;
+            }, 100);
+        });
+    }
+</script>

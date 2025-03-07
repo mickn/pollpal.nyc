@@ -1,0 +1,63 @@
+.progress-bar {
+    transition: width 0.3s ease;
+}
+
+.quiz-card {
+    transition: all 0.3s ease;
+}
+
+.radio-button {
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.radio-button input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 24px;
+    width: 24px;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.radio-button:hover input~.checkmark {
+    border-color: #94a3b8;
+}
+
+.radio-button input:checked~.checkmark {
+    background-color: white;
+    border-color: #2563eb;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.radio-button input:checked~.checkmark:after {
+    display: block;
+}
+
+.radio-button .checkmark:after {
+    top: 4px;
+    left: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #2563eb;
+}
+
+.result-bar {
+    transition: width 1s ease;
+}

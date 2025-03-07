@@ -1,0 +1,108 @@
+# PollPal.nyc Project Intelligence
+
+This file captures important patterns, preferences, and project intelligence for the PollPal.nyc project. It serves as a learning journal to help Cline work more effectively with the project.
+
+## Critical Implementation Paths
+
+1. **Jekyll Build Process**
+   - Jekyll processes all files in the project directory unless explicitly excluded
+   - Virtual environment directories like `venv` should be excluded in `_config.yml`
+   - Build process generates static site in `_site` directory
+   - Run with `bundle exec jekyll serve` for local development
+
+2. **Quiz Implementation**
+   - Quiz questions are defined in `index.md` as HTML
+   - Candidate stances are defined in `_layouts/quiz.html` as a JavaScript object
+   - Scoring algorithm multiplies user stance by candidate stance
+   - Results are displayed with animated percentage bars
+
+3. **Site Structure**
+   - `_layouts/` contains layout templates (default.html, quiz.html)
+   - `_includes/` contains reusable components (header.html, footer.html)
+   - `assets/` contains CSS, JavaScript, and images
+   - Content pages use Markdown with YAML front matter
+
+## Project-Specific Patterns
+
+1. **Content Organization**
+   - Main content is in Markdown files with YAML front matter
+   - Layout templates use Liquid templating language
+   - Components are included using Liquid includes
+   - Static assets are organized by type in the assets directory
+
+2. **Styling Approach**
+   - Tailwind CSS is loaded via CDN in the default layout
+   - Custom CSS is in `assets/css/quiz.css`
+   - Blue color scheme is used throughout the site
+   - Card-based layout for quiz components
+
+3. **JavaScript Patterns**
+   - Vanilla JavaScript with no framework dependencies
+   - Event listeners for user interactions
+   - DOM manipulation for showing/hiding elements
+   - Scoring algorithm in `_layouts/quiz.html`
+
+4. **Build Configuration**
+   - `_config.yml` contains site-wide configuration
+   - `exclude` list prevents processing of certain directories
+   - `collections` defines structured content types
+   - `defaults` sets default front matter for pages
+
+## Known Challenges
+
+1. **Build Process Issues**
+   - Jekyll may attempt to process non-website files, causing build failures
+   - Solution: Add problematic directories to the `exclude` list in `_config.yml`
+
+2. **Quiz Logic Inconsistencies**
+   - Quiz assumes 14 questions but references totalQuestions = 15 in the code
+   - The total number of questions is hardcoded in multiple places
+   - Edge case: If a user skips all questions, the results may not be meaningful
+
+3. **Content Maintenance**
+   - Candidate positions need regular updates as the campaign progresses
+   - Limited information about candidates beyond their stance on issues
+   - No detailed explanations of the issues presented in the quiz
+
+## User Preferences and Workflow
+
+1. **Project Organization**
+   - Memory Bank files are stored in the `memory-bank/` directory
+   - Core files include projectbrief.md, productContext.md, activeContext.md, systemPatterns.md, techContext.md, and progress.md
+   - Memory Bank files should be updated when significant changes are made
+
+2. **Development Workflow**
+   - Local development using Jekyll's built-in server
+   - Testing across different browsers and devices
+   - Regular updates to candidate positions as needed
+   - Documentation of changes in Memory Bank files
+
+## Evolution of Project Decisions
+
+1. **Initial Architecture**
+   - Jekyll was chosen for its simplicity and effectiveness for this use case
+   - Static site generation provides performance and security benefits
+   - Tailwind CSS was selected for rapid UI development
+   - Vanilla JavaScript was chosen for simplicity and performance
+
+2. **Recent Changes**
+   - Added `venv` to the `exclude` list in `_config.yml` to fix build issues
+   - Created Memory Bank files to document project context and progress
+   - Identified inconsistencies in quiz logic (totalQuestions = 15 vs. 14 actual questions)
+
+## Tool Usage Patterns
+
+1. **Jekyll Commands**
+   - `bundle exec jekyll serve` - Start local development server
+   - `bundle exec jekyll build` - Generate static site
+   - `bundle install` - Install dependencies
+
+2. **Git Workflow**
+   - Regular commits with descriptive messages
+   - Changes to configuration files should be documented
+   - Updates to candidate positions should be tracked
+
+3. **Testing Approach**
+   - Manual testing across different browsers and devices
+   - Verification of quiz functionality and scoring
+   - Checking responsive design at various screen sizes

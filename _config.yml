@@ -1,0 +1,29 @@
+title: PollPal.nyc
+description: Helping New Yorkers make informed voting decisions
+url: https://pollpal.nyc
+baseurl: ""
+
+# Build settings
+markdown: kramdown
+permalink: pretty
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .git
+  - venv
+
+# Collections
+collections:
+  candidates:
+    output: true
+    permalink: /candidates/:path/
+
+# Default front matter
+defaults:
+  -
+    scope:
+      path: ""
+    values:
+      layout: "default"
